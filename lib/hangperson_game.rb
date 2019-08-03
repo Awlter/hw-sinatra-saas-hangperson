@@ -7,9 +7,11 @@ class HangpersonGame
 
   # def initialize()
   # end
-  
+  attr_accessor :word, :guesses, :wrong_guesses
   def initialize(word)
     @word = word
+    @guesses = ''
+    @wrong_guesses = ''
   end
 
   # You can test it by running $ bundle exec irb -I. -r app.rb
@@ -24,4 +26,25 @@ class HangpersonGame
     }
   end
 
+  def guess(letter)
+    raise ArgumentError if letter.to_s =~ /(^$|[^\w\s]+)/i
+    return false if (guesses + wrong_guesses) =~ /#{Regexp.escape letter}/i
+
+    if word.include?(letter)
+      guesses << letter
+    else
+      wrong_guesses << letter
+    end
+  end
+
+  def word_with_guesses
+    word.chars.each_with_object('') do |letter, result|
+      result << (guesses.include?(letter) ? letter : '-')
+    end
+  end
+
+  def check_win_or_lose
+    return :lose if wrong_guesses.length >= 7
+    word.chars.all? { |l| guesses.include? l} ? :win : :play
+  end
 end
